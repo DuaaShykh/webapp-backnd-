@@ -10,6 +10,7 @@ const vaccineRoutes = require('./routes/vaccineApi')
 const verificationRoutes = require('./routes/verificationApi')
 const verifierRoutes = require('./routes/verifierApi')
 const vaccinationRoutes = require('./routes/vaccinationApi')
+// const patientVaccinedRoutes = require('./routes/patientVaccined')
 const adminRoutes = require('./routes/adminApi')
 
 app.use('/VCRegistration', VCRegistrationRoutes );
@@ -17,6 +18,7 @@ app.use('/VFRegistration', VFRegistrationRoutes );
 app.use('/patientRegistration', patientRegistrationRoutes );
 app.use('/doctorRegistration', doctorRegistrationRoutes );
 app.use('/vaccine', vaccineRoutes );
+// app.use('/patientVaccined', patientVaccinedRoutes );
 app.use('/verification', verificationRoutes );
 app.use('/verifier', verifierRoutes );
 app.use('/vaccination', vaccinationRoutes );

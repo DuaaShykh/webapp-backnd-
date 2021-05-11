@@ -46,6 +46,9 @@ router.post('/', function (req, res) {
 });
 
 
+
+
+
 router.get('/search/:v_id', function (req, res) {
   
   let v_id = req.params.v_id;
@@ -61,8 +64,24 @@ router.get('/search/:v_id', function (req, res) {
 
 });
 
+router.get('/:v_id', function (req, res) {
+  
+  let v_id = req.params.v_id;
 
-router.put('/update/:v_id', function(req, res, next) {
+  if (!v_id) {
+      return res.status(400).send({ error: true, message: 'Please provide id' });
+  }
+
+  db.query('SELECT * FROM vaccination where v_id=?', v_id, function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: false, data: results[0], message: 'Information by ID.' });
+  });
+
+});
+
+
+router.put('/update', function(req, res, next) {
+
   let v_id = req.body.v_id;
   let patient_id = req.body.patient_id;
   let vaccine_id = req.body.vaccine_id;
@@ -77,10 +96,8 @@ router.put('/update/:v_id', function(req, res, next) {
     return res.status(400).send({ error:true, message: 'Please provide Information to be add' });
 }
 
-
-  db.query(`UPDATE vaccination SET name= "${patient_id}" ,  "${vc_id}", "${vaccine_id}" , "${doctor_id}" , "${time}" ,"${date}" , 
-  "${result}" , "${reason}" WHERE v_id= ${v_id} `, function(error, results, fields) {
-     if (error) throw error;
+    db.query("Update vaccination SET patient_id = ?, vc_id = ?, vaccine_id = ? , doctor_id =?, time=?, date = ? , result = ? , reason =? WHERE v_id = ?", [patient_id, vc_id, vaccine_id, doctor_id , time , date , result , reason, v_id], function (error, results, fields) {   
+  if (error) throw error;
       return res.send({ error: false, data: results, message: 'Record has been added' });
   })
 });
@@ -90,17 +107,19 @@ router.put('/update/:v_id', function(req, res, next) {
 
 
 
-router.delete('/delete/:v_id', function (req, res) {
+router.delete('/delete/:v_id', function (req, res, next) {
   
-  let v_id = req.body.v_id;
+  let v_id = req.params.v_id;
 
   if (!v_id) {
       return res.status(400).send({ error: true, message: 'Please provide id' });
   }
-  db.query(`DELETE FROM vaccination WHERE v_id = ${v_id}`, function (error, results, fields) {
+  db.query("DELETE FROM vaccination WHERE v_id = ?",[v_id], function (error, results, fields) {
       if (error) throw error;
       return res.send({ error: false, data: results, message: 'User Data has been deleted' });
-  });
+       
+      })
+
 }); 
 
 

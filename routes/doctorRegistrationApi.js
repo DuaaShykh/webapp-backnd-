@@ -52,11 +52,11 @@ router.post('/', function (req, res) {
 });
 
 router.post("/login",(req,res)=>{
-  const doctor_id = req.body.doctor_id;
+  const admin_id = req.body.admin_id;
   const password = req.body.password;
   db.query(
     "SELECT * FROM doctor WHERE doctor_id = ? AND password = ? ",
-    [doctor_id,password],
+    [admin_id,password],
     (err,result)=>{
       if(err){
         res.send({err: err});
@@ -71,7 +71,26 @@ router.post("/login",(req,res)=>{
 });
 
 
-router.put('/update/:id', function(req, res, next) {
+
+
+router.get('/:doctor_id', function (req, res) {
+  
+  let doctor_id = req.params.doctor_id;
+
+  if (!doctor_id) {
+      return res.status(400).send({ error: true, message: 'Please provide id' });
+  }
+
+  db.query('SELECT * FROM doctor where doctor_id=?', doctor_id, function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: false, data: results[0], message: 'Information by ID.' });
+  });
+
+});
+
+
+router.put('/update', function(req, res, next) {
+
   let doctor_id = req.body.doctor_id;
   let vc_id = req.body.vc_id;
   let f_name = req.body.f_name;
@@ -88,14 +107,34 @@ router.put('/update/:id', function(req, res, next) {
   let state = req.body.state;
   let zip = req.body.zip;
 
-  var sql = `UPDATE doctor SET name= "${vc_id}", "${f_name}", "${l_name}", "${email}", "${password}", "${address}", "${phone}", "${qualification}", "${gender}", "${dob}", "${religion}", "${city}", "${state}", "${zip}" WHERE id=${doctor_id}`;
-  db.query(sql, function(err, result) {
-    if(err) {
-      res.status(500).send({ error: 'Something failed!' })
-    }
-    res.json({'status': 'success'})
+  if (!doctor_id || !vc_id || !f_name || l_name || !email || !password || !address || !phone || !qualification || !gender || !dob || !religion || !city || !state || !zip) {
+    return res.status(400).send({ error:true, message: 'Please provide Information to be add' });
+}
+
+    db.query("Update doctor SET vc_id = ?, f_name = ?, l_name = ? , email =?, password=?, address = ? , phone = ? , qualification =?, gender = ?, dob = ?, religion = ?, city = ?, state = ?, zip = ? WHERE doctor_id = ?", 
+    [vc_id , f_name , l_name , email ,password , address , phone , qualification,gender,dob, religion,city,state,zip , doctor_id], function (error, results, fields) {   
+  if (error) throw error;
+      return res.send({ error: false, data: results, message: 'Record has been added' });
   })
 });
+
+
+
+
+router.delete('/delete/:doctor_id', function (req, res, next) {
+  
+  let doctor_id = req.params.doctor_id;
+
+  if (!doctor_id) {
+      return res.status(400).send({ error: true, message: 'Please provide id' });
+  }
+  db.query("DELETE FROM doctor WHERE doctor_id = ?",[doctor_id], function (error, results, fields) {
+      if (error) throw error;
+      return res.send({ error: false, data: results, message: 'User Data has been deleted' });
+       
+      })
+
+}); 
 
 
 module.exports = router;
